@@ -1,0 +1,13 @@
+{
+  "name": "ha-washing-machine-monitor-card",
+  "private": true,
+  "description": "Tests for the bundled washing-machine-card (the integration itself is tested with pytest).",
+  "scripts": {
+    "check": "node --check custom_components/washing_machine_monitor/www/washing-machine-card.js",
+    "test": "npm run check && node tests/card.test.js && node tests/card.clock.test.js"
+  },
+  "devDependencies": {
+    "@sinonjs/fake-timers": "^13.0.5",
+    "jsdom": "24.1.3"
+  }
+}

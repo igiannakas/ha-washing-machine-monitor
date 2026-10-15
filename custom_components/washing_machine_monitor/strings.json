@@ -1,0 +1,136 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Washing machine",
+        "description": "Pick the smart plug the washing machine is connected to. Its power reading decides when a wash starts and finishes, and adds up each wash's energy.",
+        "data": {
+          "name": "Name",
+          "power_entity_id": "Power sensor",
+          "threshold_w": "Washing above",
+          "finish_delay_min": "Finished after",
+          "min_wash_min": "Shortest wash",
+          "finished_hold_min": "Show as finished for",
+          "notify_services": "Send the push to",
+          "live_activity": "Live Activity while washing",
+          "notify_title": "Push title",
+          "open_path": "Tapping the push opens",
+          "price": "Price per kWh"
+        },
+        "data_description": {
+          "name": "Shown on the card and in the push.",
+          "power_entity_id": "The smart plug's power reading in watts.",
+          "threshold_w": "The machine counts as washing while it draws more than this: above what it draws switched on but idle, below what it draws filling with water. Standby and a finished machine sit below it.",
+          "finish_delay_min": "How long the draw must stay below the threshold before the wash counts as finished. The drum rests at a few watts during a programme, so this has to outlast those pauses. The push arrives this long after the last spin.",
+          "min_wash_min": "Runs shorter than this (a door lock, a programme cancelled straight away) are ignored: not counted and no push.",
+          "finished_hold_min": "After a wash is found to have finished (when the push goes out), the status stays Finished, and the card green, for this long.",
+          "notify_services": "Phones that get \"Washing done\" with the finish time, duration, energy and cost. Leave empty for no push.",
+          "live_activity": "On the phones above that use the Home Assistant app: a lock-screen timer from a couple of minutes into a wash, green once it's done (iPhone with iOS 17.2 or later, Android 16). A Labs feature of the app.",
+          "open_path": "A dashboard path, for example /lovelace/washing-machine. Leave empty for a push without a link.",
+          "price": "Leave empty to use the grid price from Settings → Energy. Each wash's cost is its energy at this price."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Another washing machine already uses this power sensor."
+    },
+    "error": {
+      "not_power": "This sensor doesn't report power (W or kW).",
+      "notify_not_found": "One of these notify actions doesn't exist. Pick from the list, or type its name without notify.",
+      "bad_path": "A dashboard path starts with /, for example /lovelace/washing-machine.",
+      "title_required": "The push needs a title.",
+      "name_required": "Give the washing machine a name."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Washing machine options",
+        "data": {
+          "power_entity_id": "Power sensor",
+          "threshold_w": "Washing above",
+          "finish_delay_min": "Finished after",
+          "min_wash_min": "Shortest wash",
+          "finished_hold_min": "Show as finished for",
+          "notify_services": "Send the push to",
+          "live_activity": "Live Activity while washing",
+          "notify_title": "Push title",
+          "open_path": "Tapping the push opens",
+          "price": "Price per kWh"
+        },
+        "data_description": {
+          "power_entity_id": "The smart plug's power reading in watts.",
+          "threshold_w": "The machine counts as washing while it draws more than this: above what it draws switched on but idle, below what it draws filling with water. Standby and a finished machine sit below it.",
+          "finish_delay_min": "How long the draw must stay below the threshold before the wash counts as finished. The drum rests at a few watts during a programme, so this has to outlast those pauses. The push arrives this long after the last spin.",
+          "min_wash_min": "Runs shorter than this (a door lock, a programme cancelled straight away) are ignored: not counted and no push.",
+          "finished_hold_min": "After a wash is found to have finished (when the push goes out), the status stays Finished, and the card green, for this long.",
+          "notify_services": "Phones that get \"Washing done\" with the finish time, duration, energy and cost. Leave empty for no push.",
+          "live_activity": "On the phones above that use the Home Assistant app: a lock-screen timer from a couple of minutes into a wash, green once it's done (iPhone with iOS 17.2 or later, Android 16). A Labs feature of the app.",
+          "open_path": "A dashboard path, for example /lovelace/washing-machine. Leave empty for a push without a link.",
+          "price": "Leave empty to use the grid price from Settings → Energy. Each wash's cost is its energy at this price."
+        }
+      }
+    },
+    "error": {
+      "not_power": "This sensor doesn't report power (W or kW).",
+      "notify_not_found": "One of these notify actions doesn't exist. Pick from the list, or type its name without notify.",
+      "bad_path": "A dashboard path starts with /, for example /lovelace/washing-machine.",
+      "already_used": "Another washing machine already uses this power sensor.",
+      "title_required": "The push needs a title."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "running": {
+        "name": "Running"
+      }
+    },
+    "event": {
+      "wash": {
+        "name": "Wash",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "finished": "Finished"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "status": {
+        "name": "Status",
+        "state": {
+          "idle": "Idle",
+          "washing": "Washing",
+          "finished": "Finished"
+        }
+      },
+      "washes_today": {
+        "name": "Washes today"
+      },
+      "washes_last_7_days": {
+        "name": "Washes last 7 days"
+      },
+      "last_wash": {
+        "name": "Last wash"
+      },
+      "washes": {
+        "name": "Washes"
+      },
+      "wash_time": {
+        "name": "Wash time"
+      }
+    }
+  },
+  "issues": {
+    "power_entity_missing": {
+      "title": "{name}: power sensor not found",
+      "description": "{name} watches {entity_id}, which doesn't exist any more (deleted or renamed). Washes can't be detected until it's back. Pick the plug's power sensor again in the integration's options (Settings → Devices & services → Washing Machine Monitor → {name} → Configure)."
+    },
+    "power_entity_disabled": {
+      "title": "{name}: power sensor disabled",
+      "description": "{name} watches {entity_id}, which is disabled. Washes can't be detected until it's enabled again (Settings → Devices & services → Entities), or pick another power sensor in the integration's options."
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "running": {
+        "default": "mdi:washing-machine-off",
+        "state": {
+          "on": "mdi:washing-machine"
+        }
+      }
+    },
+    "event": {
+      "wash": {
+        "default": "mdi:washing-machine"
+      }
+    },
+    "sensor": {
+      "status": {
+        "default": "mdi:washing-machine",
+        "state": {
+          "idle": "mdi:washing-machine-off",
+          "finished": "mdi:check-circle-outline"
+        }
+      },
+      "washes_today": {
+        "default": "mdi:counter"
+      },
+      "washes_last_7_days": {
+        "default": "mdi:calendar-week"
+      },
+      "last_wash": {
+        "default": "mdi:lightning-bolt"
+      },
+      "washes": {
+        "default": "mdi:counter"
+      },
+      "wash_time": {
+        "default": "mdi:timer-outline"
+      }
+    }
+  }
+}

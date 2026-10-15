@@ -1,0 +1,25 @@
+{
+  "domain": "washing_machine_monitor",
+  "name": "Washing Machine Monitor",
+  "after_dependencies": [
+    "energy",
+    "frontend",
+    "lovelace",
+    "notify",
+    "recorder"
+  ],
+  "codeowners": [
+    "@igiannakas"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "http",
+    "websocket_api"
+  ],
+  "documentation": "https://github.com/igiannakas/ha-washing-machine-monitor",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/igiannakas/ha-washing-machine-monitor/issues",
+  "requirements": [],
+  "version": "1.4.1"
+}
