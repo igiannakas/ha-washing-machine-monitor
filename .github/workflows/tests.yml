@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          pip install ruff==0.16.9 pytest-homeassistant-custom-component==0.13.372  # Home Assistant 2026.10.1
+          npm install
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Integration tests
+        run: python -m pytest tests/ -v
+
+      - name: Card tests
+        run: npm test
