@@ -89,11 +89,14 @@ Turn on **Live Activity while washing** for a lock-screen timer on the phones th
 Assistant app (iPhone with iOS 17.2 or later, also in the Dynamic Island; a Live Update on
 Android 16). It is a Labs feature of the app and needs Home Assistant 2026.7 or later.
 
-- It appears two minutes into a wash, with the machine drawing power, counting up from the
-  start. A door lock or a switch-on surge is over long before, so it never comes and goes for
-  nothing; a programme cancelled after that ends it again.
-- At the end it turns green (*Washing done · Unload the clothes · 1 h 52 min*, the finish time
-  on the right) without an alert of its own: the push is the alert. Tapping it opens the wash.
+- It appears two minutes into a wash, with the machine drawing power: **Washing machine on**,
+  a timer counting up from the start, and *since 11:31* on the right. The phone keeps the timer
+  going, so nothing more is sent while the wash runs. A door lock or a switch-on surge is over
+  long before, so it never comes and goes for nothing; a programme cancelled after that ends it
+  again.
+- At the end it turns green (*Done after 1 h 52 min · Unload the clothes*, the finish time on
+  the right) without an alert of its own: the push is the alert. Tapping it opens the wash. An
+  iPhone keeps the title a Live Activity started with, so it still reads *Washing machine on*.
 - It stays until someone opens the wash by tapping the push or the Live Activity (the card
   tells the integration), then goes from every phone. The next wash starting replaces it; turning
   it off or deleting the washing machine ends it too. A restart neither starts it again nor
@@ -119,10 +122,12 @@ the same design rules:
   under it what the wash is doing: "Started 17:31", or the finished wash's length, energy and cost.
 - **Power pill** while a wash runs: the plug's watts, "⚡ 196 W" in orange (the watts half of the
   printer and appliance cards' pill). It opens the power sensor. The card doesn't switch the plug.
-- **Today's numbers**, split by straight dividers: washes today, how long the wash has been
-  running (or when the last one ended), and the plug's energy today and its cost, as the Energy
-  dashboard counts them. A plug that isn't on the Energy dashboard: today's washes' energy, a
-  running one counted in.
+- **Today's numbers**, split by straight dividers, once there's been a wash today or one is
+  running: how long the running one has been going, and the plug's energy today and its cost,
+  as the Energy dashboard counts them. A plug that isn't on the Energy dashboard: today's
+  washes' energy, a running one counted in. A day without washes shows none of them, so the
+  card stays compact; how many washes each day had, and when the last one was, are the tiles
+  below.
 - **One tile per day** for the last 7 days (washes that finished that day, today on the right),
   a heat map in green: stronger with each wash (1, 2, 3 or more), a day without washes neutral.
   Under them the 7 days' totals, starting on the device icon's edge (set a touch inside it, so

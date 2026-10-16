@@ -138,7 +138,10 @@ const pill = (r) => (r.querySelector(".pill").hidden ? null : text(r.querySelect
     eq(pill(r), null);
     assert(!r.querySelector(".tog"), "the card doesn't switch the plug");
     const yesterday = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: TZ }).format(new Date(Date.now() - DAY));
-    eq(stats(r), [["0", "Washes today"], [`${yesterday} ${text({ textContent: new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: TZ }).format(new Date(Date.now() - DAY)) })}`, "Last wash"], ["0.00 kWh", "Today"], ["0p", "Today's cost"]]);
+    // No wash today: no strip of today's numbers (the tile says 0), and never the last wash's time
+    // or the day's count (the tiles show both).
+    eq(stats(r), []);
+    assert.strictEqual(r.querySelector(".stats").innerHTML, "", "an empty strip takes no room (.stats:empty)");
     const tiles = [...r.querySelectorAll(".day")];
     eq(tiles.length, 7);
     eq(text(tiles[6].querySelector(".dk")), "Today");
@@ -171,7 +174,7 @@ const pill = (r) => (r.querySelector(".pill").hidden ? null : text(r.querySelect
     eq(calls.length, 1, "no refetch when nothing changed");
 
     // With a dashboard to open, a tap anywhere but the controls goes there; the watts open the sensor.
-    r.querySelector(".stats").click();
+    r.querySelector(".ft").click();
     r.querySelector(".nm").click();
     r.querySelector(".w").click();
     eq(events, [["navigate", "/lovelace/washing-machine"], ["navigate", "/lovelace/washing-machine"], ["more-info", "sensor.washing_machine_power"]]);
@@ -223,7 +226,8 @@ const pill = (r) => (r.querySelector(".pill").hidden ? null : text(r.querySelect
     eq(r.querySelector(".pill ha-icon").getAttribute("icon"), "mdi:flash");
     r.querySelector(".pill button").click();
     eq(events, [["more-info", "sensor.washing_machine_power"]], "the watts open the power sensor, not the dashboard");
-    eq(stats(r), [["0", "Washes today"], ["48 min", "Washing for"], ["0.62 kWh", "Today"], ["15p", "Today's cost"]]);
+    // A wash running: how long, and today's energy and cost; the count is on the Today tile.
+    eq(stats(r), [["48 min", "Washing for"], ["0.62 kWh", "Today"], ["15p", "Today's cost"]]);
     // Tiles count finished washes, like the integration.
     eq(text(r.querySelectorAll(".day")[6].querySelector(".dv")), "0");
     assert.match(r.querySelectorAll(".day")[6].getAttribute("aria-label"), /washing now$/);
@@ -252,12 +256,12 @@ const pill = (r) => (r.querySelector(".pill").hidden ? null : text(r.querySelect
     eq(text(r.querySelector(".nm")), "Washing machine · Finished");
     eq(text(r.querySelector(".sc")), "1 h 52 min · 0.84 kWh · 20p");
     assert.match(r.querySelector(".shape ha-icon").style.color, /green/);
-    eq(stats(r)[0], ["1", "Wash today"]);
+    eq(stats(r), [["1.48 kWh", "Today"], ["35p", "Today's cost"]], "no count or Last wash: the tiles below show both");
     eq(text(r.querySelectorAll(".day")[6].querySelector(".dv")), "1");
     // Without a dashboard to open, each number opens its own sensor.
-    r.querySelectorAll(".stats > button")[1].click();
+    r.querySelectorAll(".stats > button")[0].click();
     r.querySelector(".nm").click();
-    eq(events, [["more-info", "sensor.washing_machine_last_wash"], ["more-info", "sensor.washing_machine_status"]]);
+    eq(events, [["more-info", "sensor.washing_machine_washes_today"], ["more-info", "sensor.washing_machine_status"]]);
 
     r.querySelectorAll(".day")[6].click();
     const sheet = window.document.querySelector("wmc-day-sheet");
@@ -273,7 +277,7 @@ const pill = (r) => (r.querySelector(".pill").hidden ? null : text(r.querySelect
     const { root } = mount(window, hass);
     await tick(10);
     const r = root();
-    eq(stats(r).slice(2), [["1.48 kWh", "Today"], ["35p", "Today's cost"]]);
+    eq(stats(r), [["1.48 kWh", "Today"], ["35p", "Today's cost"]]);
   }
   // 6a. The plug on the Energy dashboard: Today and its cost, the 7 days' total and each day's
   //     energy are what the dashboard counts (standby included), not the washes' own; tapping
@@ -287,9 +291,9 @@ const pill = (r) => (r.querySelector(".pill").hidden ? null : text(r.querySelect
     const { card, root, events } = mount(window, hass);
     await tick(10);
     const r = root();
-    eq(stats(r).slice(2), [["0.28 kWh", "Today"], ["7p", "Today's cost"]]);
+    eq(stats(r), [["0.28 kWh", "Today"], ["7p", "Today's cost"]]);
     eq(text(r.querySelector(".ft")), "Last 7 days · 2 washes · 0.68 kWh · 16p");
-    r.querySelectorAll(".stats > button")[2].click();
+    r.querySelectorAll(".stats > button")[0].click();
     eq(events, [["more-info", "sensor.washing_machine_energy_today"]]);
 
     r.querySelectorAll(".day")[6].click();

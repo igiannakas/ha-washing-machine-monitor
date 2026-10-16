@@ -28,7 +28,7 @@
  *   navigation_path: /lovelace/washing-machine   # optional
  */
 
-const WMC_VERSION = "1.4.1";
+const WMC_VERSION = "1.4.3";
 const WMC_TAG = "washing-machine-card";
 const WMC_DOMAIN = "washing_machine_monitor";
 /* The "washing done" push opens the dashboard with ?wash=<when the wash finished, in Unix seconds>. */
@@ -553,17 +553,15 @@ class WashingMachineCard extends HTMLElement {
       line = bits;
     }
 
-    // Today's numbers: the washes that finished today, plus the one running.
+    // Today's energy and cost, only once there is something to tell: a wash finished today, or
+    // one is running (and then how long it has been going). The tiles below already show how many
+    // washes each day had, today's included, and when the last one was; a day without washes
+    // shows none of these.
     const today = S[ent.washes_today];
     const done = num(today?.state);
     const stats = [];
-    if (d) {
-      stats.push({ v: done === null ? "–" : fmt(done), l: done === 1 ? "Wash today" : "Washes today", e: ent.washes_today });
+    if (d && (done > 0 || key === "washing")) {
       if (key === "washing") stats.push({ v: elapsed === null ? "–" : dur(elapsed), l: "Washing for", e: ent.status });
-      else {
-        const end = Date.parse(S[ent.last_wash]?.attributes?.finished || "");
-        stats.push({ v: Number.isFinite(end) ? since(end, tz) : "–", l: "Last wash", e: ent.last_wash });
-      }
       const board = d.energy ? num(d.energy.days?.[dayKeyFn(tz)(new Date())]) : null;
       let kwh;
       let cost;

@@ -775,7 +775,8 @@ async def test_the_live_activity_follows_a_wash(hass: HomeAssistant, freezer: Fr
     assert all(not c for c in sent.values())  # not yet: a false start is over by now
     await advance(hass, freezer, 0.6)  # 2 minutes in, drawing power with no new reading
     start = sent["mobile_app_ioannis_iphone"][0].data
-    assert start["title"] == "Washing" and start["message"] == "Started 10:15"
+    assert start["title"] == "Washing machine on" and start["data"]["critical_text"] == "since 10:15"
+    assert start["data"]["chronometer"] is True
     assert start["data"]["when"] == int(dt_util.parse_datetime("2026-10-15 10:15:20+00:00").timestamp())
     assert start["data"]["tag"] == f"washing_machine_monitor_{entry.entry_id}_live"
     assert not sent["telegram_home"]  # only the companion app has Live Activities
@@ -788,7 +789,8 @@ async def test_the_live_activity_follows_a_wash(hass: HomeAssistant, freezer: Fr
         assert live(sent[n]) == ["washing", "push", "done"]
     assert live(sent["telegram_home"]) == ["push"]
     done = sent["mobile_app_nancy_iphone"][2].data
-    assert done["title"] == "Washing done" and done["data"]["critical_text"] == "11:17"
+    assert done["title"] == "Washing machine on" and done["data"]["critical_text"] == "11:17"
+    assert done["message"] == "Done after 1 h 2 min · Unload the clothes"
     assert entry.runtime_data.live == "done"
 
     await advance(hass, freezer, 180)  # Finished is long over: green until someone opens the wash

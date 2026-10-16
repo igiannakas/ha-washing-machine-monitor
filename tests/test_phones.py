@@ -57,14 +57,18 @@ def test_the_link_names_the_wash_by_its_end() -> None:
 
 
 def test_the_live_activity_counts_up_from_the_start() -> None:
+    """Washing machine on, the phone's own timer counting up, since 11:15 on the right: nothing to
+    re-send while the wash runs."""
     p = phones.live_washing(WASH.start, tz=LONDON, path="/lovelace/washing-machine", tag="washing_machine_monitor_E1_live")
-    assert p["title"] == "Washing" and p["message"] == "Started 11:15"
+    assert p["title"] == "Washing machine on"
+    assert p["message"] == "Washing since 11:15"  # Android shows it beside the timer; on an iPhone the timer is the line
     assert p["data"] == {
         "tag": "washing_machine_monitor_E1_live",
         "live_update": True,
         "chronometer": True,
         "when": int(WASH.start.timestamp()),  # in the past: the app counts up from it
         "when_relative": False,
+        "critical_text": "since 11:15",
         "notification_icon": "mdi:washing-machine",
         "notification_icon_color": "#FF9800",
         "url": "/lovelace/washing-machine",
@@ -74,7 +78,9 @@ def test_the_live_activity_counts_up_from_the_start() -> None:
 
 def test_done_is_quiet_and_green_and_links_to_the_wash() -> None:
     p = phones.live_done(WASH, tz=LONDON, path="/lovelace/washing-machine", tag="T")
-    assert p["title"] == "Washing done" and p["message"] == f"Unload the clothes · 2{NB}h{NB}7{NB}min"
+    # An iPhone keeps the title the Live Activity started with: the line says the wash is done.
+    assert p["title"] == "Washing machine on"
+    assert p["message"] == f"Done after 2{NB}h{NB}7{NB}min · Unload the clothes"
     d = p["data"]
     assert d["live_update"] and d["silent"] and d["alert_once"]  # the push is the alert
     assert d["chronometer"] is False and d["critical_text"] == "13:21"

@@ -8,11 +8,16 @@ the clothes" under it, and the wash in numbers. Tapping it opens the dashboard p
 it (?wash=<when it finished, in Unix seconds>), and the card there opens that wash.
 
 The Live Activity (iPhone, iOS 17.2 and later; a Live Update on Android 16): once a wash has run for
-LIVE_AFTER with the machine drawing power, the lock screen shows it with a timer counting up from its
-start. At the end it turns green and says what to do, quietly: the push is the alert. It stays until
-someone opens the wash by tapping the push or it (the card tells the integration), then goes from
-every phone; the next wash starting replaces it. Only the companion app's notify actions
-(mobile_app_*) get it; any other notify action would show every update as a message.
+LIVE_AFTER with the machine drawing power, the lock screen shows "Washing machine on", a timer
+counting up from the start (the phone keeps it going: no update is sent for it) and "since 11:31" on
+the right. At the end it turns green and says it's done and what to do, quietly: the push is the
+alert. It stays until someone opens the wash by tapping the push or it (the card tells the
+integration), then goes from every phone; the next wash starting replaces it. Only the companion
+app's notify actions (mobile_app_*) get it; any other notify action would show every update as a
+message.
+
+On an iPhone the timer takes the message line's place, and the title is set once, when the Live
+Activity starts: the green one keeps LIVE_TITLE, so its line says the wash is done.
 """
 from __future__ import annotations
 
@@ -26,6 +31,7 @@ GREEN = "#4CAF50"  # finished, as on the card
 ORANGE = "#FF9800"  # washing, as on the card
 WHITE = "#FFFFFF"
 UNLOAD = "Unload the clothes"
+LIVE_TITLE = "Washing machine on"  # the Live Activity's title, from its start to the end
 LINK_KEY = "wash"  # the card reads it from the address the push opens
 # A false start (a door lock, the machine's switch-on surge) is over within seconds; a wash is still
 # drawing power after this, so its Live Activity never comes and goes for nothing.
@@ -72,23 +78,27 @@ def finished_push(
 
 
 def live_washing(started: datetime, *, tz: tzinfo, path: str | None, tag: str) -> dict[str, Any]:
-    """Washing, with a timer counting up from the start (a start in the past counts up)."""
+    """Washing machine on / a timer counting up from the start (one in the past counts up) / since
+    11:31 on the right. The message is for Android, which shows it beside the timer."""
+    since = f"{started.astimezone(tz):%H:%M}"
     data: dict[str, Any] = {
         "tag": tag,
         "live_update": True,
         "chronometer": True,
         "when": int(started.timestamp()),
         "when_relative": False,
+        "critical_text": f"since {since}",
         "notification_icon": ICON,
         "notification_icon_color": ORANGE,
     }
     _link(data, path)
-    return {"title": "Washing", "message": f"Started {started.astimezone(tz):%H:%M}", "data": data}
+    return {"title": LIVE_TITLE, "message": f"Washing since {since}", "data": data}
 
 
 def live_done(wash: Wash, *, tz: tzinfo, path: str | None, tag: str) -> dict[str, Any]:
-    """Washing done / Unload the clothes · 1 h 52 min, the finish time on the right. No alert of its
-    own (silent on iPhone, alert_once on Android): the push that goes with it is the alert."""
+    """Washing machine on / Done after 1 h 52 min · Unload the clothes, the finish time on the right.
+    No alert of its own (silent on iPhone, alert_once on Android): the push that goes with it is the
+    alert."""
     data: dict[str, Any] = {
         "tag": tag,
         "live_update": True,
@@ -100,7 +110,7 @@ def live_done(wash: Wash, *, tz: tzinfo, path: str | None, tag: str) -> dict[str
         "notification_icon_color": GREEN,
     }
     _link(data, wash_link(path, wash) if path else None)
-    return {"title": "Washing done", "message": f"{UNLOAD} · {format_duration(wash.minutes)}", "data": data}
+    return {"title": LIVE_TITLE, "message": f"Done after {format_duration(wash.minutes)} · {UNLOAD}", "data": data}
 
 
 def live_end(tag: str) -> dict[str, Any]:
